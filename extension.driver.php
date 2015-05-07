@@ -80,8 +80,12 @@ class Extension_Multilingual extends Extension
     public function frontendPrePageResolve($context)
     {
         if (!self::$resolved) {
+	    //knt: get TLD
+	    preg_match("`(?<=\.)\w+$`", $_SERVER['SERVER_NAME'], $tld_array);
+	    $tld = $tld_array[0];
 
             // get languages from configuration
+		Symphony::Log()->writeToLog("context:" . print_r($tld,true));
 
             if (self::$languages = Symphony::Configuration()->get('languages', 'multilingual')) {
 
@@ -95,7 +99,12 @@ class Extension_Multilingual extends Extension
 
                     self::$language = $match[1];
 
-                } else {
+                } elseif ($tld == "de") {
+		   self::$language = "de";
+		} elseif ($tld == "com") {
+		   self::$language = "en";
+		}
+		else {
 
                     // detect language from browser
 
@@ -112,10 +121,8 @@ class Extension_Multilingual extends Extension
                 }
 
                 // redirect root page
-
                 if (!$context['page']) {
-
-                    header('Location: ' . URL . '/' . self::$language . '/'); exit;
+                    //header('Location: ' . URL . '/'); exit;
                 }
             }
 
