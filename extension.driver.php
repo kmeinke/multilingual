@@ -85,7 +85,7 @@ class Extension_Multilingual extends Extension
 	    $tld = $tld_array[0];
 
             // get languages from configuration
-		Symphony::Log()->writeToLog("context:" . print_r($tld,true));
+		//Symphony::Log()->writeToLog("context:" . print_r($tld,true));
 
             if (self::$languages = Symphony::Configuration()->get('languages', 'multilingual')) {
 
