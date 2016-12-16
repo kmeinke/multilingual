@@ -2,16 +2,23 @@
 <extension id="multilingual" status="released" xmlns="http://getsymphony.com/schemas/extension/1.0">
     <name>Multilingual</name>
     <description>Provides basic helpers for multilingual projects.</description>
-    <repo type="github">https://github.com/jensscherbl/multilingual</repo>
+    <repo type="github">https://github.com/kmeinke/multilingual</repo>
     <types>
         <type>Multilingual</type>
     </types>
     <authors>
         <author>
+            <name github="kmeinke" symphony="kmeinke">Knut Meinke</name>
             <name github="jensscherbl" symphony="jensscherbl">Jens Scherbl</name>
         </author>
     </authors>
     <releases>
+        <release version="1.2.0" date="2016-09-14" min="2.3.3" max="2.6.5">
+            - Checked compatibility with 2.6.5
+            - Rewrote language resolution
+            - Removed language in path detection
+            - Added language in query string "lang" detection
+        </release>
         <release version="1.1.0" date="2014-09-15" min="2.3.3" max="2.x.x">
             - Added changes for compatibility with Symphony 2.x.x
             - Added attribute `translated` to indicate when fields fall back to default language

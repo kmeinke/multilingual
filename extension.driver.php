@@ -41,7 +41,6 @@ class Extension_Multilingual extends Extension
     public function uninstall()
     {
         // remove languages from configuration
-
         Symphony::Configuration()->remove('multilingual');
         Symphony::Configuration()->write();
     }
@@ -51,18 +50,15 @@ class Extension_Multilingual extends Extension
     public function addCustomPreferenceFieldsets($context)
     {
         // get languages from configuration
-
         $languages = Symphony::Configuration()->get('languages', 'multilingual');
         $languages = str_replace(' ', '',   $languages);
         $languages = str_replace(',', ', ', $languages);
 
         // add settings for language codes
-
         $group = new XMLElement('fieldset');
         $group->setAttribute('class', 'settings');
 
         $children['legend'] = new XMLElement('legend', __('Multilingual'));
-
         $children['label'] = new XMLElement('label', __('Languages'));
         $children['label']->appendChild(Widget::Input('settings[multilingual][languages]', $languages, 'text'));
 
@@ -71,7 +67,6 @@ class Extension_Multilingual extends Extension
         $children['help']->setValue(__('Comma-separated list of <a href="http://en.wikipedia.org/wiki/ISO_639-1">ISO 639-1</a> language codes.'));
 
         $group->appendChildArray($children);
-
         $context['wrapper']->appendChild($group);
     }
 
@@ -79,51 +74,19 @@ class Extension_Multilingual extends Extension
 
     public function frontendPrePageResolve($context)
     {
-        if (!self::$resolved) {
-	    //knt: get TLD
-	    preg_match("`(?<=\.)\w+$`", $_SERVER['SERVER_NAME'], $tld_array);
-	    $tld = $tld_array[0];
+        //if language is not resolved && language is set && there are configured languages ==> resolve language
+        if (!self::$resolved && self::$languages = Symphony::Configuration()->get('languages', 'multilingual')) {
+            self::$languages = explode(',', str_replace(' ', '', self::$languages));
 
-            // get languages from configuration
-		//Symphony::Log()->writeToLog("context:" . print_r($tld,true));
+            //resolve language by query string or accept_language header field - fall back to default
+            if(isset($_GET['lang']) && in_array($_GET['lang'], self::$languages)) {
+                self::$language = $_GET['lang'];
 
-            if (self::$languages = Symphony::Configuration()->get('languages', 'multilingual')) {
+            } else if (in_array(substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2), self::$languages)) {
+                self::$language = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
 
-                self::$languages = explode(',', str_replace(' ', '', self::$languages));
-
-                // detect language from path
-
-                if (preg_match('/^\/([a-z]{2})\//', $context['page'], $match)) {
-
-                    // set language from path
-
-                    self::$language = $match[1];
-
-                } elseif ($tld == "de") {
-		   self::$language = "de";
-		} elseif ($tld == "com") {
-		   self::$language = "en";
-		}
-		else {
-
-                    // detect language from browser
-
-                    self::$language = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
-                }
-
-                // check if language is supported
-
-                if (!in_array(self::$language, self::$languages)) {
-
-                    // set to default otherwise
-
-                    self::$language = self::$languages[0];
-                }
-
-                // redirect root page
-                if (!$context['page']) {
-                    //header('Location: ' . URL . '/'); exit;
-                }
+            } else {
+                self::$language = self::$languages[0];
             }
 
             self::$resolved = true;
